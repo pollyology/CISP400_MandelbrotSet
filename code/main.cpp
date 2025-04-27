@@ -35,24 +35,24 @@ int main()
 			if (event.type == Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
 			{
 				plane.zoomOut();
-				plane.setCenter(event.mouseButton.x, event.mouseButton.y);
+				plane.setCenter(Vector2i(event.mouseButton.x, event.mouseButton.y));
 			}
 
 			if (event.type == Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Right)
 			{
 				plane.zoomIn();
-				plane.setCenter(event.mouseButton.x, event.mouseButton.y);
+				plane.setCenter(Vector2i(event.mouseButton.x, event.mouseButton.y));
 			}
 
 			if (event.type == Event::MouseMoved)
 			{
-				plane.setMouseLocation(event.mouseButton.x, event.mouseButton.y);
+				plane.setMouseLocation(Vector2i(event.mouseButton.x, event.mouseButton.y));
 			}
 		}
 			
 	}
 
-	if (KeyBoard::isKeyPressed(Keyboard::Escape))
+	if (Keyboard::isKeyPressed(Keyboard::Escape))
 	{	
 		window.close();
 	}
@@ -65,7 +65,7 @@ int main()
 	// Draw Scene
 
 	window.clear();
-	window.draw(plane);
+	plane.draw(window, RenderStates::Default);
 	window.draw(text);
 	window.display();
 

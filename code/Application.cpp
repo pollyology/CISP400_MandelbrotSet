@@ -5,6 +5,4 @@
 #include <thread>
 #include <vector>
 
-#include <SFML/Graphics.hpp>
-#include "Mandelbrot.cpp"
 

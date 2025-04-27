@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 
+/**
 struct MandelbrotSet
 {
     std::vector<int> image;
@@ -20,3 +21,4 @@ struct MandelbrotSet
         image.resize(width * height);
     }
 }
+**/

@@ -7,20 +7,23 @@ void ComplexPlane::draw(RenderTarget& target, RenderStates states) const
 
 void ComplexPlane::updateRender()
 {
-	uint8 r, g, b;
+	Uint8 r, g, b;
+	int pixelWidth = m_pixel_size.x;
+	int pixelHeight = m_pixel_size.y;
 
 	if (m_state == State::CALCULATING)
 	{
-		for (int x = 0; x < BASE_WIDTH; x++)
+		for (int x = 0; x < pixelWidth; x++)
 		{
-			for (int y = 0; y < BASE_HEIGHT; y++)
+			for (int y = 0; y < pixelHeight; y++)
 			{
-				vArray[x + y * pixelWidth].position = { (float)x, (float)i };
-				Vector2f newCoord = mapPixelToCoords(x, y);
-				numIter = countIterations(newCoord);
+				size_t newIndex = size_t(x + y * pixelWidth);
+				m_vArray[newIndex].position = { (float)x, (float)y };
+				Vector2f newCoord = mapPixelToCoords(Vector2i(x, y));
+				int numIter = countIterations(newCoord);
 				
-				iterationsToRGB(numIter, r, g, b)
-				vArray[j + i * pixelWidth].color = { r, g, b };
+				iterationsToRGB(numIter, r, g, b);
+				m_vArray[newIndex].color = { r, g, b };
 			}
 			
 		}
@@ -31,28 +34,28 @@ void ComplexPlane::updateRender()
 void ComplexPlane::zoomIn()
 {
 	m_zoomCount++;
-	float newX = BASE_WIDTH * pow(BASE_ZOOM, m_zoomCount);
-	float newY = BASE_HEIGHT * m_aspectRatio * pow(BASE_ZOOM, m_zoomCount);
-	m_plane_size(newX, newY);
-	m_state == State::CALCULATING;
+	float newX = float(BASE_WIDTH * pow(BASE_ZOOM, m_zoomCount));
+	float newY = float(BASE_HEIGHT * m_aspectRatio * pow(BASE_ZOOM, m_zoomCount));
+	m_plane_size = Vector2f(newX, newY);
+	m_state = State::CALCULATING;
 }
 
-void ComplexPlane::zoomIn()
+void ComplexPlane::zoomOut()
 {
 	m_zoomCount--;
-	float newX = BASE_WIDTH * pow(BASE_ZOOM, m_zoomCount);
-	float newY = BASE_HEIGHT * m_aspectRatio * pow(BASE_ZOOM, m_zoomCount);
-	m_plane_size(newX, newY);
-	m_state == State::CALCULATING;
+	float newX = float(BASE_WIDTH * pow(BASE_ZOOM, m_zoomCount));
+	float newY = float(BASE_HEIGHT * m_aspectRatio * pow(BASE_ZOOM, m_zoomCount));
+	m_plane_size = Vector2f(newX, newY);
+	m_state = State::CALCULATING;
 }
 
-void ComplexPlane::setCenter(std::vector<Vector2i> mousePixel)
+void ComplexPlane::setCenter(Vector2i mousePixel)
 {
 	m_plane_center = mapPixelToCoords(mousePixel);
-	m_state == State::CALCULATING;
+	m_state = State::CALCULATING;
 }
 
-void ComplexPlane::setMouseLocation(vector<Vector2i> mousePixel)
+void ComplexPlane::setMouseLocation(Vector2i mousePixel)
 {
 	m_mouseLocation = mapPixelToCoords(mousePixel);
 }
@@ -69,7 +72,7 @@ void ComplexPlane::loadText(Text& text)
 			// Cursor updates live
 }
 
-int ComplexPlane::countIterations(std::vector<Vector2f> coord)
+int ComplexPlane::countIterations(Vector2f coord)
 {
 	// Count the number of iterations of the set for the given coordinate as specified above
 }
