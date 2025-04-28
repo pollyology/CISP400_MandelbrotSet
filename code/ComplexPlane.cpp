@@ -62,19 +62,22 @@ void ComplexPlane::setMouseLocation(Vector2i mousePixel)
 
 void ComplexPlane::loadText(Text& text)
 {
-	// Use stringstream and member variables to output:
-		// Mandelbrot Set
-		// Center: (0,0)
-		// Cursor: (-1.05313, 0.828125)
-		// Left-click to Zoom in
-		// Right-click to Zoom out
-			// Center updates after click
-			// Cursor updates live
+	std::stringstream ss
+
+	// Assume m_plane_center[0] is center and m_mouseLocation[0] is the cursor
+	ss << "Mandelbrot Set\n";
+	ss << "Center: " << m_plane_center[0].x << "," << m_plane_center[0].y << ")\n";
+	ss << "Cursor: " << m_mouseLocation[0].x << "," << m_mouseLocation[0].y << ")\n";
+	ss << "Left-click to Zoom in\n";
+	ss << "Right-click to Zoom out\n";
+
+	text.setString(ss.str());
 }
 
 int ComplexPlane::countIterations(Vector2f coord)
 {
 	// Count the number of iterations of the set for the given coordinate as specified above
+
 }
 
 void ComplexPlane::iterationsToRGB(size_t count, Uint8& r, Uint8& g, Uint8& b)

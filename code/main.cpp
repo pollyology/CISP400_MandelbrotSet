@@ -22,6 +22,8 @@ int main()
 	Text text;
 	Font font;
 
+	plane.loadText(text);
+
 	while (window.isOpen())
 	{
 		Event event;
@@ -46,7 +48,7 @@ int main()
 
 			if (event.type == Event::MouseMoved)
 			{
-				plane.setMouseLocation(Vector2i(event.mouseButton.x, event.mouseButton.y));
+				plane.setMouseLocation(Vector2i(event.mouseMove.x, event.mouseMove.y));
 			}
 		}
 			
