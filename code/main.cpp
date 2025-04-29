@@ -5,7 +5,7 @@
 #include <vector>
 #include <cstdlib>
 #include <ctime>
-#include "ComplexPlane.cpp"
+#include "ComplexPlane.h"
 
 using namespace sf;
 using namespace std;
@@ -19,8 +19,19 @@ int main()
 	RenderWindow window(vm, "Mandelbrot Set", Style::Default);
 	ComplexPlane plane(width, height);
 
-	Text text;
+	Color default = Color::White;
 	Font font;
+	if (!font.loadFromFile("matryoshka.tff"))
+	{
+		cout << "Unable to load font file \n";
+		return -1;
+	}
+
+	Text text;
+	text.setFont(font);
+	text.setCharacterSize(25);
+	text.setFillColor(default);
+	text.setPosition(14, 14);
 
 	plane.loadText(text);
 
