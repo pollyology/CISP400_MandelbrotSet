@@ -1,5 +1,17 @@
 #include "ComplexPlane.h"
 
+ComplexPlane::ComplexPlane(int pixelWidth, int pixelHeight) :
+	m_pixel_size{ pixelWidth, pixelHeight },
+	m_plane_center{ 0, 0 },
+	m_plane_size{ BASE_WIDTH, BASE_HEIGHT * m_aspectRatio },
+	m_zoomCount(0),
+	m_state(State::CALCULATING)
+{
+	m_aspectRatio = float(pixelHeight) / float(pixelWidth);
+	m_vArray.setPrimitiveType(Points);
+	m_vArray.resize(size_t(pixelWidth) * size_t(pixelHeight));
+}
+
 void ComplexPlane::draw(RenderTarget& target, RenderStates states) const
 {
 	target.draw(m_vArray);
@@ -123,14 +135,29 @@ void ComplexPlane::iterationsToRGB(size_t count, Uint8& r, Uint8& g, Uint8& b)
 
 Vector2f ComplexPlane::mapPixelToCoords(Vector2i mousePixel)
 {
-	// X-plane represents real numbers, Y-plane represents imaginary numbers
-	// mousePixel.x & mousePixel.y = the x and y position of the mouse
-	// m_pixel_size = the resolution size of screen (in pixels)
-	// m_plane_size = the size of the complex plane
-
+	// ((n - a) / (b - a)) * (d - c) + c
+	// n = mousePixel.x/y = mousePos_x & mousePos_y
+	// a = m_plane_size.x/y = planeWidth & planeHeight
+	// b = m_pixel_size.x/y = screenWidth & screenHeight
+	// d - c = m_plane_size.x/y 
+	// +c = (m_plane_center.x/y  - m_plane_size.x/y)
+	// ((mousePixel.x - m_plane_size.x) / (m_pixel_size.x - m_plane_size.x)) * m_plane_size.x + (m_plane_center.x - m_plane.size.x / 2.0)
 	
-	float real;
-	float imag;
+	int xMousePos = mousePixel.x;
+	int yMousePos = mousePixel.y;
 
-	return Vector2f(real, imag);
+	float xPlaneWidth = m_plane_size.x;
+	float yPlaneHeight = m_plane_size.y;
+
+	float xPlaneCenter = m_plane_center.x;
+	float yPlaneCenter = m_plane_center.y;
+
+	float xScreenWidth = m_pixel_size.x;
+	float yScreenHeight = m_pixel_size.y;
+
+
+	float xCoord = ((xMousePos - xPlaneWidth) / (xScreenWidth - xPlaneWidth)) * xPlaneWidth + (xPlaneCenter - xPlaneWidth / 2.0);
+	float yCoord = ((yMousePos - yPlaneHeight) / (yScreenHeight - yPlaneHeight)) * yPlaneHeight + (yPlaneCenter - yPlaneHeight / 2.0);;
+
+	return Vector2f(xCoord, yCoord);
 }
