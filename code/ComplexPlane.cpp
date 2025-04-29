@@ -17,7 +17,7 @@ void ComplexPlane::updateRender()
 		{
 			for (int y = 0; y < pixelHeight; y++)
 			{
-				size_t newIndex = size_t(x + y * pixelWidth);
+				int newIndex = x + y * pixelWidth;
 				m_vArray[newIndex].position = { (float)x, (float)y };
 				Vector2f newCoord = mapPixelToCoords(Vector2i(x, y));
 				int numIter = countIterations(newCoord);
@@ -62,12 +62,12 @@ void ComplexPlane::setMouseLocation(Vector2i mousePixel)
 
 void ComplexPlane::loadText(Text& text)
 {
-	std::stringstream ss
+	std::stringstream ss;
 
-	// Assume m_plane_center[0] is center and m_mouseLocation[0] is the cursor
+	// Assume m_plane_center is center and m_mouseLocation is the cursor
 	ss << "Mandelbrot Set\n";
-	ss << "Center: " << m_plane_center[0].x << "," << m_plane_center[0].y << ")\n";
-	ss << "Cursor: " << m_mouseLocation[0].x << "," << m_mouseLocation[0].y << ")\n";
+	ss << "Center: " << m_plane_center.x << "," << m_plane_center.y << ")\n";
+	ss << "Cursor: " << m_mouseLocation.x << "," << m_mouseLocation.y << ")\n";
 	ss << "Left-click to Zoom in\n";
 	ss << "Right-click to Zoom out\n";
 
@@ -77,15 +77,60 @@ void ComplexPlane::loadText(Text& text)
 int ComplexPlane::countIterations(Vector2f coord)
 {
 	// Count the number of iterations of the set for the given coordinate as specified above
+	// Mandelbrot Set Equation: f(z) = z^2 + c
 
+	complex<double> z = 0;
+	complex<double> c = {coord.x, coord.y}; // complex = real + imaginary, ex: 2 + 3i
+
+	int iterations = 0;
+
+	while (abs(z) < 2.0 && iterations <= MAX_ITER) // max magnitude is 2.0
+	{
+		z = pow(z, 2) + c;
+		iterations++;
+	}
+
+	return iterations;
 }
 
 void ComplexPlane::iterationsToRGB(size_t count, Uint8& r, Uint8& g, Uint8& b)
 {
+	// TODO: Rlly bad color palette, change later - 4/28 PC
+	if (count == MAX_ITER)
+	{
+		r = g = b = 0;
+	}
+	else if (count > 0 && count <= MAX_ITER * 0.25)
+	{
+		r = g = b = 256 * 0.25;
+	}
+	else if (count > 16 && count <= MAX_ITER * 0.50)
+	{
+		r = g = b = 256 * 0.50;
+	}
+	else if (count > 32 && count <= MAX_ITER * 0.75)
+	{
+		r = g = b = 256 * 0.75;
+	}
+	else
+	{
+		r = 218;
+		g = 247;
+		b = 166;
+	}
 
 }
 
 Vector2f ComplexPlane::mapPixelToCoords(Vector2i mousePixel)
 {
+	// X-plane represents real numbers, Y-plane represents imaginary numbers
+	// mousePixel.x & mousePixel.y = the x and y position of the mouse
+	// m_pixel_size = the resolution size of screen (in pixels)
+	// m_plane_size = the size of the complex plane
 
+	
+	float real;
+	float imag;
+
+	return Vector2f(real, imag);
 }
