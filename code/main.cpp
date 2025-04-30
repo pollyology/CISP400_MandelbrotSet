@@ -19,21 +19,19 @@ int main()
 	RenderWindow window(vm, "Mandelbrot Set", Style::Default);
 	ComplexPlane plane(width, height);
 
-	Color default = Color::White;
+	Color default = Color::Black;
+	Text text;
 	Font font;
-	if (!font.loadFromFile("matryoshka.tff"))
+
+	if (!font.loadFromFile("matryoshka.ttf"))
 	{
 		cout << "Unable to load font file \n";
-		return -1;
 	}
 
-	Text text;
 	text.setFont(font);
 	text.setCharacterSize(25);
 	text.setFillColor(default);
 	text.setPosition(14, 14);
-
-	plane.loadText(text);
 
 	while (window.isOpen())
 	{
@@ -62,26 +60,24 @@ int main()
 				plane.setMouseLocation(Vector2i(event.mouseMove.x, event.mouseMove.y));
 			}
 		}
-			
+
+		if (Keyboard::isKeyPressed(Keyboard::Escape))
+		{
+			window.close();
+		}
+		
+		// Update Scene
+
+		plane.updateRender();
+		plane.loadText(text);
+
+		// Draw Scene
+
+		window.clear();
+		//plane.draw(window, RenderStates::Default);
+		window.draw(plane);
+		window.draw(text);
+		window.display();
+
 	}
-
-	if (Keyboard::isKeyPressed(Keyboard::Escape))
-	{	
-		window.close();
-	}
-
-	// Update Scene
-
-	plane.updateRender();
-	plane.loadText(text);
-
-	// Draw Scene
-
-	window.clear();
-	plane.draw(window, RenderStates::Default);
-	window.draw(text);
-	window.display();
-
-	
-
 }
