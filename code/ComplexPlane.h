@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <complex>
+#include <thread>
 #include <vector>
 #include <SFML/Graphics/VertexArray.hpp>
 #include <SFML/Graphics/Text.hpp>
@@ -13,7 +14,7 @@
 using namespace sf;
 using namespace std;
 
-const unsigned int MAX_ITER = 64;
+const unsigned int MAX_ITER = 100;
 const float BASE_WIDTH = 4.0;
 const float BASE_HEIGHT = 4.0;
 const float BASE_ZOOM = 0.5;
@@ -35,6 +36,7 @@ public:
 	void setMouseLocation(Vector2i mousePixel);
 	void loadText(Text& text);
 	void updateRender();
+	void renderFractal(int startRow, int endRow);
 
 private:
 	// Objects
