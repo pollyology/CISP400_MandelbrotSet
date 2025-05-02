@@ -19,14 +19,14 @@ void ComplexPlane::draw(RenderTarget& target, RenderStates states) const
 	target.draw(m_vArray);
 }
 
-void ComplexPlane::updateRender()
+void ComplexPlane::updateRender(int threads)
 {
 	int pixelWidth = m_pixel_size.x;
 	int pixelHeight = m_pixel_size.y;
 
 	if (m_state == State::CALCULATING)
 	{
-		const int NUM_THREADS = 12;
+		const int NUM_THREADS = threads;
 		vector<thread> threads;
 		int rowsPerThread = pixelHeight / NUM_THREADS;
 
