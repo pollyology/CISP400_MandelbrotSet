@@ -35,7 +35,7 @@ public:
 	void setCenter(Vector2i mousePixel);
 	void setMouseLocation(Vector2i mousePixel);
 	void loadText(Text& text);
-	void updateRender();
+	void updateRender(int threads);
 	void renderFractal(int startRow, int endRow);
 
 private:
