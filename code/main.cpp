@@ -18,6 +18,7 @@ int main()
 	VideoMode vm(width, height);
 	RenderWindow window(vm, "Mandelbrot Set", Style::Default);
 	ComplexPlane plane(width, height);
+	const int NUM_THREADS = 12;
 
 	Color default = Color::White;
 	Text text;
@@ -89,7 +90,7 @@ int main()
 		
 		// Update Scene
 
-		plane.updateRender();
+		plane.updateRender(NUM_THREADS);
 		plane.loadText(text);
 
 		// Draw Scene
