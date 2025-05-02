@@ -11,7 +11,7 @@ ComplexPlane::ComplexPlane(int pixelWidth, int pixelHeight)
 	m_state = State::CALCULATING;
 
 	m_vArray.setPrimitiveType(Points);
-	m_vArray.resize(pixelWidth * pixelHeight);
+	m_vArray.resize(size_t(pixelWidth) * size_t(pixelHeight));
 }
 
 void ComplexPlane::draw(RenderTarget& target, RenderStates states) const
@@ -26,21 +26,43 @@ void ComplexPlane::updateRender()
 
 	if (m_state == State::CALCULATING)
 	{
+		const int NUM_THREADS = 12;
+		vector<thread> threads;
+		int rowsPerThread = pixelHeight / NUM_THREADS;
+
+		for (int t = 0; t < NUM_THREADS; t++)
+		{
+			int startRow = t * rowsPerThread;
+			int endRow = (t == NUM_THREADS - 1) ? pixelHeight : (t + 1) * rowsPerThread;
+
+			threads.emplace_back(thread(&ComplexPlane::renderFractal, this, startRow, endRow));
+		}
+
+		for (auto& thread : threads)
+		{
+			thread.join();
+		}
+
+		m_state = State::DISPLAYING;
+	}
+}
+
+void ComplexPlane::renderFractal(int startRow, int endRow)
+{
+	int pixelWidth = m_pixel_size.x;
+
+	for (int i = startRow; i < endRow; i++)
+	{
 		for (int j = 0; j < pixelWidth; j++)
 		{
-			for (int i = 0; i < pixelHeight; i++)
-			{
-				m_vArray[j + i * pixelWidth].position = { (float)j, (float)i };
-				Vector2f newCoord = mapPixelToCoords(Vector2i(j, i));
-				int numIter = countIterations(newCoord);
+			m_vArray[j + i * pixelWidth].position = { (float)j, (float)i };
+			Vector2f newCoord = mapPixelToCoords(Vector2i(j, i));
+			int numIter = countIterations(newCoord);
 
-				Uint8 r, g, b;
-				iterationsToRGB(numIter, r, g, b);
-				m_vArray[j + i * pixelWidth].color = { r, g, b };
-			}
-
+			Uint8 r, g, b;
+			iterationsToRGB(numIter, r, g, b);
+			m_vArray[j + i * pixelWidth].color = { r, g, b };
 		}
-		m_state = State::DISPLAYING;
 	}
 }
 
@@ -129,16 +151,11 @@ void ComplexPlane::iterationsToRGB(size_t count, Uint8& r, Uint8& g, Uint8& b)
 
 Vector2f ComplexPlane::mapPixelToCoords(Vector2i mousePixel)
 {
-	// ((n - a) / (b - a)) * (d - c) + c
-	// n = mousePixel.x/y = mousePos_x & mousePos_y
-	// a = m_plane_size.x/y = planeWidth & planeHeight
-	// b = m_pixel_size.x/y = screenWidth & screenHeight
-	// d - c = m_plane_size.x/y 
-	// +c = (m_plane_center.x/y  - m_plane_size.x/y)
-	// ((mousePixel.x - m_plane_size.x) / (m_pixel_size.x - m_plane_size.x)) * m_plane_size.x + (m_plane_center.x - m_plane.size.x / 2.0)
+	float x = float(mousePixel.x) / m_pixel_size.x;
+	float y = float(mousePixel.y) / m_pixel_size.y;
 
-	float xCoord = (float(mousePixel.x - 0) / (m_pixel_size.x - 0)) * m_plane_size.x + (m_plane_center.x - m_plane_size.x / 2.0);
-	float yCoord = (float(mousePixel.y - m_pixel_size.y) / (0 - m_pixel_size.y)) * m_plane_size.y + (m_plane_center.y - m_plane_size.y / 2.0);
+	float xCoord = m_plane_center.x + (x - 0.5f) * m_plane_size.x;
+	float yCoord = m_plane_center.y + (y - 0.5f) * m_plane_size.y;
 
 	return Vector2f(xCoord, yCoord);
 }
