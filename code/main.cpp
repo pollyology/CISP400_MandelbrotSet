@@ -15,11 +15,11 @@ int main()
 	unsigned int width = VideoMode::getDesktopMode().width;
 	unsigned int height = VideoMode::getDesktopMode().height;
 
-	VideoMode vm(width / 2, height / 2);
+	VideoMode vm(width, height);
 	RenderWindow window(vm, "Mandelbrot Set", Style::Default);
 	ComplexPlane plane(width, height);
 
-	Color default = Color::Black;
+	Color default = Color::White;
 	Text text;
 	Font font;
 
@@ -33,11 +33,25 @@ int main()
 	text.setFillColor(default);
 	text.setPosition(14, 14);
 
+	window.setMouseCursorVisible(false);
+	Texture cursorTexture;
+	Texture zoomInTexture;
+	Texture zoomOutTexture;
+
+	cursorTexture.loadFromFile("Zoom.png");
+	zoomInTexture.loadFromFile("Zoom_In.png");
+	zoomOutTexture.loadFromFile("Zoom_Out.png");
+
+	Sprite cursor(cursorTexture);
+	cursor.setScale(2.0f, 2.0f);
+	
 	while (window.isOpen())
 	{
 		Event event;
 		while (window.pollEvent(event))
 		{
+			Vector2i currentMousePos(event.mouseButton.x, event.mouseButton.y);
+			
 			if (event.type == Event::Closed)
 			{
 				window.close();
@@ -45,21 +59,28 @@ int main()
 
 			if (event.type == Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
 			{
-				plane.zoomOut();
-				plane.setCenter(Vector2i(event.mouseButton.x, event.mouseButton.y));
+				plane.zoomIn();
+				plane.setCenter(currentMousePos);
+
+				cursor.setTexture(zoomInTexture);
 			}
 
 			if (event.type == Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Right)
 			{
-				plane.zoomIn();
-				plane.setCenter(Vector2i(event.mouseButton.x, event.mouseButton.y));
+				plane.zoomOut();
+				plane.setCenter(currentMousePos);
+
+				cursor.setTexture(zoomOutTexture);
 			}
 
 			if (event.type == Event::MouseMoved)
 			{
-				plane.setMouseLocation(Vector2i(event.mouseMove.x, event.mouseMove.y));
+				plane.setMouseLocation(currentMousePos);
 			}
 		}
+
+		Vector2i cursorPos = Mouse::getPosition(window);
+		cursor.setPosition(Vector2f(cursorPos));
 
 		if (Keyboard::isKeyPressed(Keyboard::Escape))
 		{
@@ -77,6 +98,7 @@ int main()
 		//plane.draw(window, RenderStates::Default);
 		window.draw(plane);
 		window.draw(text);
+		window.draw(cursor);
 		window.display();
 
 	}
