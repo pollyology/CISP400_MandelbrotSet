@@ -8,6 +8,7 @@ ComplexPlane::ComplexPlane(int pixelWidth, int pixelHeight)
 	m_plane_center = { 0, 0 };
 	m_plane_size = { BASE_WIDTH, BASE_HEIGHT * m_aspectRatio };
 	m_zoomCount = 0;
+	m_autoZoom = false;
 	m_state = State::CALCULATING;
 
 	m_vArray.setPrimitiveType(Points);
@@ -66,6 +67,22 @@ void ComplexPlane::renderFractal(int startRow, int endRow)
 	}
 }
 
+void ComplexPlane::zoomInAuto()
+{
+	if (!m_autoZoom) return;
+
+	// Adjusts the auto zoom speed (smaller = faster)
+	float zoomFactor = pow(BASE_ZOOM, 0.15f);
+
+	// Applies zoom factor while keeping aspect ratio
+	float newX = float(BASE_WIDTH * pow(BASE_ZOOM, m_zoomCount) * zoomFactor);
+	float newY = float(BASE_HEIGHT * m_aspectRatio * pow(BASE_ZOOM, m_zoomCount) * zoomFactor);
+
+	m_plane_size = Vector2f(newX, newY);
+	m_zoomCount++;
+	m_state = State::CALCULATING;
+}
+
 void ComplexPlane::zoomIn()
 {
 	m_zoomCount++;
@@ -100,6 +117,7 @@ void ComplexPlane::setMouseLocation(Vector2i mousePixel)
 void ComplexPlane::loadText(Text& text)
 {
 	std::stringstream ss;
+	string ON_OFF = (m_autoZoom) ? "ON" : "OFF";
 
 	// Assume m_plane_center is center and m_mouseLocation is the cursor
 	ss << "Mandelbrot Set\n";
@@ -107,6 +125,7 @@ void ComplexPlane::loadText(Text& text)
 	ss << "Cursor: (" << m_mouseLocation.x << "," << m_mouseLocation.y << ")\n";
 	ss << "Left-click to Zoom in\n";
 	ss << "Right-click to Zoom out\n";
+	ss << "AUTOZOOM: " << ON_OFF << "\n";
 
 	text.setString(ss.str());
 }
@@ -132,20 +151,41 @@ int ComplexPlane::countIterations(Vector2f coord)
 
 void ComplexPlane::iterationsToRGB(size_t count, Uint8& r, Uint8& g, Uint8& b)
 {
-	// TODO: Rlly bad color palette, change later - 4/28 PC
+	// Default color of main cardioid 
 	if (count >= MAX_ITER)
 	{
-		r = g = b = 0;
+		r = 0;
+		g = 59;
+		b = 54;
+		return;
 	}
-	else
-	{
-		// Simple RGB gradient: fades from blue to white
-		Uint8 brightness = static_cast<Uint8>(255 * count / MAX_ITER);
 
-		r = brightness;
-		g = brightness;
-		b = 255; // Full blue base
+	Uint8 colors[4][3] = 
+	{
+		{208, 241, 255}, // light blue
+		{151, 218, 245}, // medium blue
+		{96, 176, 251},  // deeper blue
+		{54, 71, 180}    // dark blue
+	};
+
+	// Figure out where we are in the color range
+	// t = color gradient as a percentage = 0 -> 1.0
+	// i = index 
+	float t = (float)count / MAX_ITER * 3; // 3 = number of transitions between 4 colors
+	int i = (int)t;
+	float blend = t - i;
+
+	// Stay within bounds
+	if (i >= 3) 
+	{
+		i = 2;
+		blend = 0.33f; // tweak this for different effects
 	}
+
+	// Blend between the two nearest colors
+	r = (Uint8)(colors[i][0] + (colors[i + 1][0] - colors[i][0]) * blend);
+	g = (Uint8)(colors[i][1] + (colors[i + 1][1] - colors[i][1]) * blend);
+	b = (Uint8)(colors[i][2] + (colors[i + 1][2] - colors[i][2]) * blend);
 }
 
 

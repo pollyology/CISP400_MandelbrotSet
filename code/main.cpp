@@ -12,26 +12,27 @@ using namespace std;
 
 int main()
 {
-	unsigned int width = VideoMode::getDesktopMode().width;
-	unsigned int height = VideoMode::getDesktopMode().height;
+	unsigned int width = VideoMode::getDesktopMode().width / 2;
+	unsigned int height = VideoMode::getDesktopMode().height / 2;
 
 	VideoMode vm(width, height);
 	RenderWindow window(vm, "Mandelbrot Set", Style::Default);
 	ComplexPlane plane(width, height);
-	const int NUM_THREADS = 12;
+	const int NUM_THREADS = 10;
 
 	Color default = Color::White;
 	Text text;
 	Font font;
 
-	if (!font.loadFromFile("matryoshka.ttf"))
+	if (!font.loadFromFile("assets/font/matryoshka.ttf"))
 	{
 		cout << "Unable to load font file \n";
 	}
 
 	text.setFont(font);
 	text.setCharacterSize(25);
-	text.setFillColor(default);
+	text.setFillColor(Color(31, 181, 122, 128));
+	text.setOutlineColor(default);
 	text.setPosition(14, 14);
 
 	window.setMouseCursorVisible(false);
@@ -39,12 +40,21 @@ int main()
 	Texture zoomInTexture;
 	Texture zoomOutTexture;
 
-	cursorTexture.loadFromFile("Zoom.png");
-	zoomInTexture.loadFromFile("Zoom_In.png");
-	zoomOutTexture.loadFromFile("Zoom_Out.png");
+	cursorTexture.loadFromFile("assets/sprites/Zoom.png");
+	zoomInTexture.loadFromFile("assets/sprites/Zoom_In.png");
+	zoomOutTexture.loadFromFile("assets/sprites/Zoom_Out.png");
 
 	Sprite cursor(cursorTexture);
 	cursor.setScale(2.0f, 2.0f);
+
+	Music music;
+	if (!music.openFromFile("assets/music/Aquatic_Ambiance.flac"))
+	{
+		cout << "Unable to locate music file \n";
+	}
+
+	music.setLoop(true);
+	music.play();
 	
 	while (window.isOpen())
 	{
@@ -78,6 +88,12 @@ int main()
 			{
 				plane.setMouseLocation(currentMousePos);
 			}
+
+			if (event.type == Event::KeyPressed && event.key.code == Keyboard::Space)
+			{
+				plane.toggleZoom();
+			}
+
 		}
 
 		Vector2i cursorPos = Mouse::getPosition(window);
@@ -88,15 +104,15 @@ int main()
 			window.close();
 		}
 		
-		// Update Scene
+		// Autozoom Function
+		plane.zoomInAuto();
 
+		// Update Scene
 		plane.updateRender(NUM_THREADS);
 		plane.loadText(text);
 
 		// Draw Scene
-
 		window.clear();
-		//plane.draw(window, RenderStates::Default);
 		window.draw(plane);
 		window.draw(text);
 		window.draw(cursor);

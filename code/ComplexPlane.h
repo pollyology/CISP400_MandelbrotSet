@@ -30,12 +30,16 @@ class ComplexPlane : public Drawable
 public:
 	ComplexPlane(int pixelWidth, int pixelHeight);
 	void draw(RenderTarget& target, RenderStates states) const;
+	void updateRender(int threads);
 	void zoomIn();
 	void zoomOut();
 	void setCenter(Vector2i mousePixel);
 	void setMouseLocation(Vector2i mousePixel);
 	void loadText(Text& text);
-	void updateRender(int threads);
+	
+	// Added Functions
+	void zoomInAuto();
+	void toggleZoom() { m_autoZoom = !m_autoZoom; }
 	void renderFractal(int startRow, int endRow);
 
 private:
@@ -52,6 +56,9 @@ private:
 	// Ints
 	Vector2i m_pixel_size;
 	int m_zoomCount;
+
+	// Bool
+	bool m_autoZoom;
 
 	// Methods
 	int countIterations(Vector2f coord);
