@@ -20,7 +20,7 @@ int main()
 	ComplexPlane plane(width, height);
 	const int NUM_THREADS = 10;
 
-	Color defaultColor = Color::White;
+	Color textColor = Color::Black;
 	Text text;
 	Font font;
 
@@ -32,7 +32,8 @@ int main()
 	text.setFont(font);
 	text.setCharacterSize(25);
 	text.setFillColor(Color(31, 181, 122, 128));
-	text.setOutlineColor(defaultColor);
+	text.setOutlineColor(textColor);
+	text.setOutlineThickness(0.5);
 	text.setPosition(14, 14);
 
 	window.setMouseCursorVisible(false);
@@ -54,7 +55,7 @@ int main()
 	}
 
 	music.setLoop(true);
-	music.setVolume(25);
+	music.setVolume(40);
 	music.play();
 	
 	while (window.isOpen())
