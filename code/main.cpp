@@ -20,7 +20,7 @@ int main()
 	ComplexPlane plane(width, height);
 	const int NUM_THREADS = 10;
 
-	Color default = Color::White;
+	Color defaultColor = Color::White;
 	Text text;
 	Font font;
 
@@ -32,7 +32,7 @@ int main()
 	text.setFont(font);
 	text.setCharacterSize(25);
 	text.setFillColor(Color(31, 181, 122, 128));
-	text.setOutlineColor(default);
+	text.setOutlineColor(defaultColor);
 	text.setPosition(14, 14);
 
 	window.setMouseCursorVisible(false);
