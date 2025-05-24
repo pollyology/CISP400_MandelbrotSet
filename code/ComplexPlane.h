@@ -38,6 +38,7 @@ public:
 	void loadText(Text& text);
 	
 	// Added Functions
+	void resetZoom();
 	void zoomInAuto();
 	void toggleZoom() { m_autoZoom = !m_autoZoom; }
 	void renderFractal(int startRow, int endRow);

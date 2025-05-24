@@ -67,12 +67,20 @@ void ComplexPlane::renderFractal(int startRow, int endRow)
 	}
 }
 
+void ComplexPlane::resetZoom()
+{
+	m_plane_center = { 0.f, 0.f };
+	m_plane_size = { BASE_WIDTH, BASE_HEIGHT * m_aspectRatio };
+	m_zoomCount = 0;
+	m_state = State::CALCULATING;
+}
+
 void ComplexPlane::zoomInAuto()
 {
 	if (!m_autoZoom) return;
 
 	// Adjusts the auto zoom speed (smaller = faster)
-	float zoomFactor = pow(BASE_ZOOM, 0.15f);
+	float zoomFactor = pow(BASE_ZOOM, 0.5f);
 
 	// Applies zoom factor while keeping aspect ratio
 	float newX = float(BASE_WIDTH * pow(BASE_ZOOM, m_zoomCount) * zoomFactor);
@@ -123,9 +131,10 @@ void ComplexPlane::loadText(Text& text)
 	ss << "Mandelbrot Set\n";
 	ss << "Center: (" << m_plane_center.x << "," << m_plane_center.y << ")\n";
 	ss << "Cursor: (" << m_mouseLocation.x << "," << m_mouseLocation.y << ")\n";
-	ss << "Left-click to Zoom in\n";
-	ss << "Right-click to Zoom out\n";
-	ss << "AUTOZOOM: " << ON_OFF << "\n";
+	ss << "Left-click: Zoom in\n";
+	ss << "Right-click: Zoom out\n";
+	ss << "Press 'E': toggle AUTOZOOM: " << ON_OFF << "\n";
+	ss << "Press 'Space': RESET ZOOM\n";
 
 	text.setString(ss.str());
 }

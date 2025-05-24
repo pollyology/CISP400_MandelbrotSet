@@ -12,8 +12,8 @@ using namespace std;
 
 int main()
 {
-	unsigned int width = VideoMode::getDesktopMode().width / 2;
-	unsigned int height = VideoMode::getDesktopMode().height / 2;
+	unsigned int width = 800;
+	unsigned int height = 800;
 
 	VideoMode vm(width, height);
 	RenderWindow window(vm, "Mandelbrot Set", Style::Default);
@@ -45,7 +45,7 @@ int main()
 	zoomOutTexture.loadFromFile("assets/sprites/Zoom_Out.png");
 
 	Sprite cursor(cursorTexture);
-	cursor.setScale(2.0f, 2.0f);
+	cursor.setScale(1.0f, 1.0f);
 
 	Music music;
 	if (!music.openFromFile("assets/music/Aquatic_Ambiance.flac"))
@@ -54,6 +54,7 @@ int main()
 	}
 
 	music.setLoop(true);
+	music.setVolume(25);
 	music.play();
 	
 	while (window.isOpen())
@@ -61,7 +62,8 @@ int main()
 		Event event;
 		while (window.pollEvent(event))
 		{
-			Vector2i currentMousePos(event.mouseButton.x, event.mouseButton.y);
+			Vector2i relativePos(Mouse::getPosition(window));												// Gets mouse position relative to window size
+			Vector2i const currentMousePos = static_cast<Vector2i>(window.mapPixelToCoords(relativePos)); // Adjusts mouse position to work with window resize
 			
 			if (event.type == Event::Closed)
 			{
@@ -90,6 +92,11 @@ int main()
 			}
 
 			if (event.type == Event::KeyPressed && event.key.code == Keyboard::Space)
+			{
+				plane.resetZoom();
+			}
+
+			if (event.type == Event::KeyPressed && event.key.code == Keyboard::E)
 			{
 				plane.toggleZoom();
 			}
